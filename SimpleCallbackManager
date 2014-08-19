@@ -1,0 +1,85 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+
+public class SimpleCallbackManager
+{
+	protected Action _doneHandler;
+	public Action DoneHandler {
+		get {
+			return _doneHandler;
+		}
+	}
+	
+	public Action Register() {
+		this.Wait();
+		return this.DoneHandler;
+	}
+	
+	private Action _completeCallback;
+	public Action CompleteCallback {
+		get {
+			return _completeCallback;
+		}
+		set {
+			_completeCallback = value;
+		}
+	}
+	
+	protected int _count;
+	
+	public int Count {
+		get {
+			return _count;
+		}
+	}
+	
+	public bool IsWaiting {
+		get {
+			return _count > 0;
+		}
+	}
+	
+	public SimpleCallbackManager Wait() {
+		return Wait (1);
+	}
+	
+	public SimpleCallbackManager Wait(int count) {
+		_count += count;
+		return this;
+	}
+	
+	public virtual void Done() {
+		Done (1);
+	}
+	
+	public virtual void Done(int count) {
+		if(_count < -10) //prevent too many exceptions in case of misuse (e.g. calling done() too many times)
+			return;
+		
+		_count -= count;
+		
+		if(_count < 0)
+			throw new System.IndexOutOfRangeException("callback counter out of range : " + _count);
+		
+		if(_count == 0 && _completeCallback != null)
+			_completeCallback();
+		
+	}
+	
+	public SimpleCallbackManager() : this(null) {
+	}
+	
+	public SimpleCallbackManager(Action completeCallback) {
+		_count = 1;
+		_completeCallback = completeCallback;
+		_doneHandler = delegate() {
+			this.Done();
+		};
+	}
+	
+	public override string ToString ()
+	{
+		return "Waiting " + _count.ToString() + " callbacks";
+	}
+}
