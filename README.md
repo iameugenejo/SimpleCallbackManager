@@ -19,7 +19,7 @@ SimpleCallbackManager
 
 
 ####Register - Simple
-  //assume there's a SetTimeout async method that takes a System.Action as a first argument and and an integer as a second argument
+ 	//assume there's a SetTimeout async method that takes a System.Action as a first argument and and an integer as a second argument
 	SetTimeout(cm.Register(), 100);
 
 ####Register - Complex : Wait for a callback then notify the manager that it is done
